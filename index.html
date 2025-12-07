@@ -92,14 +92,14 @@ async function searchYT(query){
     if(!res.ok) throw new Error('API failed');
     const data = await res.json();
     if(!data?.result?.length) throw new Error('No results');
-    return data.result.map(item=>({
+    return data.result.map(item=>(({
       title: item.title || "Unknown",
       url: item.url || item.id,
       thumbnail: item.thumbnail || item.thumb,
       duration: item.timestamp || item.duration || "Unknown",
       views: item.views || "N/A",
       published: item.ago || ""
-    }));
+    })));
   }catch(e){ log('Search failed', true); return []; }
 }
 
@@ -121,13 +121,11 @@ function renderResults(list){
     resultsEl.appendChild(item);
   });
 
-  // Download buttons call your own backend
   document.querySelectorAll('.smallBtn.mp3').forEach(btn=>{
-    btn.onclick=()=> {
+    btn.onclick=()=>{
       const v=list[parseInt(btn.dataset.idx)];
       const a=document.createElement('a');
-      // Replace with your own backend API
-      a.href=`/api/ytdl/${encodeURIComponent(v.url)}?fileType=mp3`;
+      a.href=`https://tharuzz-ofc-api-v3.vercel.app/api/ytdl/yt?url=${encodeURIComponent(v.url)}&fileType=mp3`;
       a.download=(v.title||'song')+'.mp3';
       a.click();
       log('MP3 download started.');
@@ -135,10 +133,10 @@ function renderResults(list){
   });
 
   document.querySelectorAll('.smallBtn.mp4').forEach(btn=>{
-    btn.onclick=()=> {
+    btn.onclick=()=>{
       const v=list[parseInt(btn.dataset.idx)];
       const a=document.createElement('a');
-      a.href=`/api/ytdl/${encodeURIComponent(v.url)}?fileType=mp4`;
+      a.href=`https://tharuzz-ofc-api-v3.vercel.app/api/ytdl/yt?url=${encodeURIComponent(v.url)}&fileType=mp4`;
       a.download=(v.title||'video')+'.mp4';
       a.click();
       log('MP4 download started.');
