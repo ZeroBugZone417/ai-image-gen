@@ -1,212 +1,406 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YouTube Downloader – Premium</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YouTube Downloader — Premium Neon</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-    body {
-        margin: 0;
-        padding: 0;
-        background: #0d0d0d;
-        font-family: 'Poppins', sans-serif;
-        overflow-x: hidden;
-    }
+  :root{
+    --bg:#07070a;
+    --card: rgba(255,255,255,0.03);
+    --accent1: #ff0044;
+    --accent2: #8a00ff;
+    --muted: #bdbdbd;
+  }
 
-    /* Floating Neon Particles */
-    .particle {
-        position: absolute;
-        width: 5px;
-        height: 5px;
-        background: #ff004c;
-        border-radius: 50%;
-        box-shadow: 0 0 10px #ff004c;
-        animation: float 6s infinite ease-in-out;
-    }
+  *{box-sizing:border-box}
+  html,body{height:100%; margin:0; font-family:'Poppins',sans-serif; background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(138,0,255,0.06), transparent 8%),
+    radial-gradient(900px 500px at 90% 90%, rgba(255,0,68,0.05), transparent 8%),
+    var(--bg); color:#fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
 
-    @keyframes float {
-        0% { transform: translateY(0); opacity: 1; }
-        50% { transform: translateY(-60px); opacity: 0.4; }
-        100% { transform: translateY(0); opacity: 1; }
-    }
+  .wrap{width:94%; max-width:980px; margin:40px auto; display:grid; grid-template-columns: 1fr 360px; gap:24px; align-items:start;}
+  @media (max-width:900px){ .wrap{grid-template-columns:1fr; padding-bottom:40px;} }
 
-    /* Main Container */
-    .container {
-        width: 90%;
-        max-width: 550px;
-        margin: auto;
-        margin-top: 7vh;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 0, 76, 0.4);
-        border-radius: 16px;
-        padding: 25px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 25px #ff004c55;
-        animation: fadeIn 1.2s ease;
-    }
+  /* Left - Main */
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px;
+    border:1px solid rgba(255,0,76,0.12);
+    box-shadow:0 8px 30px rgba(0,0,0,0.6), 0 0 30px rgba(138,0,255,0.04);
+    position:relative;
+    overflow:hidden;
+  }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(25px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+  header.site {
+    display:flex; gap:12px; align-items:center;
+    margin-bottom:14px;
+  }
+  .logo {
+    width:56px; height:56px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    box-shadow:0 6px 18px rgba(138,0,255,0.18);
+    font-weight:700; font-size:18px;
+  }
+  .title h1{margin:0; font-size:20px; color:#fff; letter-spacing:0.2px;}
+  .title p{margin:2px 0 0; color:var(--muted); font-size:13px;}
 
-    h1 {
-        text-align: center;
-        color: #ff003c;
-        font-weight: 600;
-        text-shadow: 0 0 15px #ff003c;
-        margin-bottom: 25px;
-    }
+  .searchRow{display:flex; gap:10px; margin-top:6px;}
+  .input{
+    flex:1; display:flex; gap:8px; align-items:center;
+    background:rgba(255,255,255,0.02); border-radius:10px; padding:10px;
+    border:1px solid rgba(255,0,76,0.08);
+  }
+  .input input{
+    background:transparent; border:0; outline:0; color:#fff; width:100%; font-size:15px;
+  }
+  .btn{
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    border:0; padding:10px 14px; border-radius:10px; cursor:pointer; color:#fff;
+    font-weight:600; box-shadow:0 8px 24px rgba(255,0,76,0.12);
+  }
+  .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); box-shadow:none; }
 
-    input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #ff003c;
-        background: #000;
-        color: #fff;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        outline: none;
-        box-shadow: 0 0 12px #ff003c55;
-    }
+  /* Results list */
+  .results{margin-top:16px; display:flex; flex-direction:column; gap:12px; max-height:60vh; overflow:auto; padding-right:6px;}
+  .resultItem{display:flex; gap:12px; align-items:center; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:10px; padding:10px; border:1px solid rgba(255,255,255,0.02);}
+  .resultThumb{width:110px; height:62px; border-radius:8px; overflow:hidden; flex-shrink:0; background:#111;}
+  .resultMeta{flex:1}
+  .resultMeta h4{margin:0; font-size:15px; line-height:1.15;}
+  .resultMeta p{margin:6px 0 0; font-size:13px; color:var(--muted);}
+  .resultActions{display:flex; gap:8px; align-items:center;}
+  .smallBtn{padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-weight:600; font-size:13px;}
+  .smallBtn.mp3{background:linear-gradient(90deg,#00c853,#00e676); color:#030;}
+  .smallBtn.mp4{background:linear-gradient(90deg,#2196f3,#7c4dff); color:#fff;}
+  .smallBtn.info{background:rgba(255,255,255,0.03); color:var(--muted); border:1px solid rgba(255,255,255,0.02);}
 
-    button {
-        width: 48%;
-        padding: 12px;
-        border: none;
-        background: linear-gradient(90deg, #ff003c, #d100ff);
-        color: white;
-        font-size: 1rem;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.3s;
-        box-shadow: 0 0 12px #ff0055aa;
-    }
+  /* Right - Preview / download panel */
+  .side{position:sticky; top:24px; height:fit-content;}
+  .previewCard{display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center;}
+  .previewThumb{width:100%; height:200px; border-radius:12px; overflow:hidden; background:#111;}
+  .previewThumb img{width:100%; height:100%; object-fit:cover;}
+  .previewTitle{font-weight:700; margin:0; font-size:16px;}
+  .previewSub{color:var(--muted); font-size:13px;}
+  .downloadArea{display:flex; gap:10px; width:100%; margin-top:8px;}
+  .downloadArea button{flex:1; padding:12px; border-radius:10px; border:0; font-weight:700; cursor:pointer;}
+  .downloadMP3{background:linear-gradient(90deg,#00e676,#00bfa5); color:#033;}
+  .downloadMP4{background:linear-gradient(90deg,#ff0044,#8a00ff); color:#fff;}
 
-    button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px #ff0055;
-    }
+  .log{margin-top:14px; font-family:monospace; font-size:13px; color:var(--muted); background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; min-height:46px; overflow:auto;}
 
-    #preview img {
-        width: 100%;
-        border-radius: 12px;
-        margin-top: 15px;
-        box-shadow: 0 0 15px #d100ff;
-    }
+  footer.foot{opacity:0.7; margin-top:14px; font-size:13px; color:var(--muted); text-align:center;}
+  a.wh{display:inline-block; margin-top:12px; text-decoration:none; background:#25D366; color:#fff; padding:8px 14px; border-radius:10px; font-weight:700;}
 
-    #output {
-        color: #ff0055;
-        margin-top: 20px;
-        font-size: 1rem;
-        padding: 10px;
-        background: rgba(255, 0, 76, 0.1);
-        border-radius: 8px;
-        text-shadow: 0 0 5px #ff0044;
-    }
-
-    .download-btns {
-        display: none;
-        justify-content: space-between;
-        margin-top: 15px;
-    }
+  /* subtle neon outlines */
+  .glow{box-shadow:0 8px 36px rgba(138,0,255,0.06), 0 0 30px rgba(255,0,76,0.04);}
 </style>
 </head>
-
 <body>
 
-<!-- Floating Neon Particles -->
-<div class="particle" style="top:10%; left:20%; animation-delay:0s;"></div>
-<div class="particle" style="top:30%; left:70%; animation-delay:1s;"></div>
-<div class="particle" style="top:60%; left:40%; animation-delay:2s;"></div>
-<div class="particle" style="top:80%; left:10%; animation-delay:3s;"></div>
+<div class="wrap">
+  <!-- MAIN -->
+  <div class="card glow">
+    <header class="site">
+      <div class="logo">YT</div>
+      <div class="title">
+        <h1>YouTube Downloader — Premium</h1>
+        <p>Search, preview & download MP3 / MP4 — Dark Neon UI</p>
+      </div>
+    </header>
 
-<div class="container">
-    <h1>YouTube Downloader Premium</h1>
-
-    <input type="text" id="videoUrl" placeholder="Paste YouTube link here...">
-
-    <button style="width:100%" onclick="fetchInfo()">
-        Fetch Video
-    </button>
-
-    <div id="preview"></div>
-
-    <div id="output">Ready…</div>
-
-    <div class="download-btns" id="downloadBtns">
-        <button onclick="downloadVideo('mp3')">Download MP3</button>
-        <button onclick="downloadVideo('mp4')">Download MP4</button>
+    <div class="searchRow">
+      <div class="input">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:0.8"><path d="M21 21l-4.35-4.35" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input id="q" placeholder="Search song or paste YouTube URL..." />
+      </div>
+      <button class="btn" id="searchBtn">Search</button>
     </div>
+
+    <div id="results" class="results" aria-live="polite"></div>
+
+    <div class="log" id="log">Ready…</div>
+    <footer class="foot">© Powered by Tharusha Sandipa — DON'T REMOVE CREDIT</footer>
+  </div>
+
+  <!-- SIDE PREVIEW -->
+  <aside class="side">
+    <div class="card previewCard">
+      <div class="previewThumb" id="previewThumb"><img src="" alt="" id="previewImg" style="display:none"/></div>
+      <div>
+        <h3 class="previewTitle" id="previewTitle">No video selected</h3>
+        <div class="previewSub" id="previewMeta">Paste a URL or search to begin</div>
+      </div>
+
+      <div class="downloadArea">
+        <button class="downloadMP3" id="btnMP3" disabled>Download MP3</button>
+        <button class="downloadMP4" id="btnMP4" disabled>Download MP4</button>
+      </div>
+
+      <a class="wh" id="whLink" target="_blank" href="https://whatsapp.com/channel/0029Vb9LTRHInlqISdCfln45">Join WhatsApp Channel</a>
+    </div>
+  </aside>
 </div>
 
 <script>
+/*
+  Integrates APIs found in bot code:
+  - Search: https://tharuzz-ofc-apis.vercel.app/api/search/ytsearch?query=
+  - Download: https://tharuzz-ofc-api-v3.vercel.app/api/ytdl/yt?url=${url}&format=mp3|mp4
 
-let videoData = null;
+  If those fail (CORS or unavailable), fallback to:
+  - https://yt-api.pawan.krd  (info / ytmp3 / ytmp4)
+*/
 
-/* API CHANGE — NEW STABLE API */
-async function fetchInfo() {
-    const url = document.getElementById("videoUrl").value.trim();
-    const output = document.getElementById("output");
-    const preview = document.getElementById("preview");
-    const dlBtns = document.getElementById("downloadBtns");
+const resultsEl = document.getElementById('results');
+const logEl = document.getElementById('log');
+const qEl = document.getElementById('q');
+const searchBtn = document.getElementById('searchBtn');
 
-    if (!url) {
-        output.innerHTML = "❌ Please enter a YouTube URL";
-        return;
-    }
+const previewImg = document.getElementById('previewImg');
+const previewTitle = document.getElementById('previewTitle');
+const previewMeta = document.getElementById('previewMeta');
+const btnMP3 = document.getElementById('btnMP3');
+const btnMP4 = document.getElementById('btnMP4');
 
-    output.innerHTML = "⏳ Fetching video details…";
+let current = null; // holds selected video object
 
+function log(msg, err=false){
+  const time = new Date().toLocaleTimeString();
+  logEl.innerText = `[${time}] ${msg}` + (err ? " ⚠️" : "");
+}
+
+function sanitizeText(s, max=80){
+  if(!s) return "";
+  return s.length>max ? s.slice(0,max-1) + "…" : s;
+}
+
+async function searchYT(query){
+  // attempt primary API (from bot code)
+  const api1 = `https://tharuzz-ofc-apis.vercel.app/api/search/ytsearch?query=${encodeURIComponent(query)}`;
+
+  try {
+    log('Searching (primary API)...');
+    const res = await fetch(api1);
+    if(!res.ok) throw new Error('primary API failed');
+    const data = await res.json();
+    if(!data || !data.result || !Array.isArray(data.result) || data.result.length===0) throw new Error('no results');
+    return data.result.map(item => ({
+      title: item.title || item.name || "Unknown",
+      url: item.url || item.link || item.videoUrl || item.id,
+      thumbnail: item.thumbnail || item.image || item.thumb,
+      duration: item.timestamp || item.seconds || item.duration || "Unknown",
+      views: item.views || item.viewCount || "N/A",
+      published: item.ago || item.published || ""
+    }));
+  } catch (e) {
+    log('Primary search failed, trying fallback...', true);
+    // fallback: pawan.krd search (we use info endpoint per query by trying ytdl info)
     try {
-        const res = await fetch(`https://api.sssgram.com/api/fetch/youtube?url=${encodeURIComponent(url)}`);
-        const data = await res.json();
-
-        if (!data || !data.data) {
-            output.innerHTML = "❌ Failed to fetch video";
-            return;
-        }
-
-        videoData = data.data;
-
-        preview.innerHTML = `
-            <img src="${videoData.thumbnail}" alt="Thumbnail">
-            <h3 style="color:#ff0055">${videoData.title}</h3>
-        `;
-
-        dlBtns.style.display = "flex";
-        output.innerHTML = "✅ Video loaded successfully";
-    } 
-    catch (err) {
-        output.innerHTML = "❌ Server error";
+      const fb = `https://yt-api.pawan.krd/api/info?url=${encodeURIComponent(query.includes('youtube') ? query : 'https://www.youtube.com/results?search_query=' + query)}`;
+      const r2 = await fetch(fb);
+      if(!r2.ok) throw new Error('fallback info failed');
+      const d2 = await r2.json();
+      // if the query was search term, pawan.krd info won't work — so attempt search via yt-search via another public endpoint is not available
+      // We'll try to interpret d2 if it's direct video info
+      if(d2 && d2.title){
+        return [{
+          title: d2.title,
+          url: d2.url || query,
+          thumbnail: d2.thumbnail,
+          duration: d2.duration,
+          views: d2.views || "N/A",
+          published: d2.published || ""
+        }];
+      }
+      throw new Error('no fallback results');
+    } catch (err){
+      log('Fallback search failed — no results', true);
+      return [];
     }
+  }
 }
 
-async function downloadVideo(type) {
-    if (!videoData) return;
-
-    const output = document.getElementById("output");
-    output.innerHTML = `⏳ Preparing ${type.toUpperCase()}…`;
-
-    let link = type === "mp3"
-        ? videoData.audio.high
-        : videoData.video.medium;
-
-    const a = document.createElement("a");
-    a.href = link;
-    a.download = videoData.title + "." + type;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    output.innerHTML = `⬇️ Download started (${type.toUpperCase()})`;
+async function fetchDownloadUrl(videoUrl, format='mp3'){
+  // primary download API from bot code
+  const apiMp = `https://tharuzz-ofc-api-v3.vercel.app/api/ytdl/yt?url=${encodeURIComponent(videoUrl)}&format=${format}`;
+  try {
+    log(`Requesting download link (primary: ${format})...`);
+    const r = await fetch(apiMp);
+    if(!r.ok) throw new Error('primary download API failed');
+    const d = await r.json();
+    // expected structure: { result: { download: 'url' } } per bot code
+    if(d && d.result && d.result.download) return d.result.download;
+    // some APIs may return direct field
+    if(d && d.download) return d.download;
+    throw new Error('no download url in primary response');
+  } catch (e) {
+    log('Primary download failed, trying fallback (pawan)...', true);
+    // fallback: pawan.krd
+    try {
+      if(format === 'mp3'){
+        const fb = `https://yt-api.pawan.krd/api/ytmp3?url=${encodeURIComponent(videoUrl)}`;
+        const r2 = await fetch(fb);
+        if(!r2.ok) throw new Error('fallback mp3 failed');
+        const d2 = await r2.json();
+        if(d2 && d2.download_url) return d2.download_url;
+      } else {
+        const fb = `https://yt-api.pawan.krd/api/ytmp4?url=${encodeURIComponent(videoUrl)}`;
+        const r2 = await fetch(fb);
+        if(!r2.ok) throw new Error('fallback mp4 failed');
+        const d2 = await r2.json();
+        if(d2 && d2.download_url) return d2.download_url;
+      }
+    } catch (err){
+      log('Fallback download failed as well.', true);
+      throw err;
+    }
+  }
 }
 
+// Render search results
+function renderResults(list){
+  resultsEl.innerHTML = '';
+  if(!list || list.length===0){
+    resultsEl.innerHTML = '<div style="color:var(--muted)">No results found.</div>';
+    return;
+  }
+  list.forEach((it, idx) => {
+    const item = document.createElement('div');
+    item.className = 'resultItem';
+    item.innerHTML = `
+      <div class="resultThumb"><img src="${it.thumbnail || ''}" alt="" style="width:100%;height:100%;object-fit:cover" /></div>
+      <div class="resultMeta">
+        <h4 title="${it.title}">${sanitizeText(it.title, 80)}</h4>
+        <p>${it.duration} • ${it.views} • ${it.published}</p>
+      </div>
+      <div class="resultActions">
+        <button class="smallBtn info" data-idx="${idx}">Preview</button>
+        <button class="smallBtn mp3" data-type="mp3" data-idx="${idx}">MP3</button>
+        <button class="smallBtn mp4" data-type="mp4" data-idx="${idx}">MP4</button>
+      </div>
+    `;
+    resultsEl.appendChild(item);
+  });
+}
+
+// select item by index
+function selectItem(list, i){
+  current = list[i];
+  if(!current) return;
+  previewImg.src = current.thumbnail || '';
+  previewImg.style.display = current.thumbnail ? 'block' : 'none';
+  previewTitle.textContent = current.title;
+  previewMeta.textContent = `${current.duration} • ${current.views} • ${current.published}`;
+  btnMP3.disabled = false;
+  btnMP4.disabled = false;
+  btnMP3.dataset.url = current.url;
+  btnMP4.dataset.url = current.url;
+}
+
+searchBtn.addEventListener('click', async ()=>{
+  const q = qEl.value.trim();
+  if(!q) return log('Enter search term or paste YouTube URL!');
+  resultsEl.innerHTML = '<div style="color:var(--muted)">Searching…</div>';
+  const list = await searchYT(q);
+  renderResults(list);
+  // attach handlers
+  document.querySelectorAll('.resultActions .info').forEach(btn=>{
+    btn.onclick = (ev)=> {
+      const idx = parseInt(btn.dataset.idx);
+      selectItem(list, idx);
+      log('Preview selected.');
+      // scroll to preview
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  });
+  document.querySelectorAll('.resultActions .mp3').forEach(btn=>{
+    btn.onclick = async (ev)=> {
+      const idx = parseInt(btn.dataset.idx);
+      const v = list[idx];
+      try {
+        log('Preparing MP3 download...');
+        const dl = await fetchDownloadUrl(v.url, 'mp3');
+        if(dl){
+          log('Starting MP3 download...');
+          const a = document.createElement('a');
+          a.href = dl;
+          a.download = (v.title || 'song') + '.mp3';
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+      } catch (e) {
+        log('Download failed: ' + e.message, true);
+        alert('Download failed. See log for details.');
+      }
+    };
+  });
+  document.querySelectorAll('.resultActions .mp4').forEach(btn=>{
+    btn.onclick = async (ev)=> {
+      const idx = parseInt(btn.dataset.idx);
+      const v = list[idx];
+      try {
+        log('Preparing MP4 download...');
+        const dl = await fetchDownloadUrl(v.url, 'mp4');
+        if(dl){
+          log('Starting MP4 download...');
+          const a = document.createElement('a');
+          a.href = dl;
+          a.download = (v.title || 'video') + '.mp4';
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+      } catch (e) {
+        log('Download failed: ' + e.message, true);
+        alert('Download failed. See log for details.');
+      }
+    };
+  });
+});
+
+// side buttons
+btnMP3.addEventListener('click', async ()=>{
+  if(!btnMP3.dataset.url) return;
+  try {
+    log('Preparing MP3 download (side)...');
+    const dl = await fetchDownloadUrl(btnMP3.dataset.url, 'mp3');
+    const a = document.createElement('a');
+    a.href = dl;
+    a.download = (current.title || 'song') + '.mp3';
+    a.target = '_blank';
+    document.body.appendChild(a); a.click(); a.remove();
+    log('MP3 download started.');
+  } catch (e) { log('Download error: ' + e.message, true); alert('Download failed'); }
+});
+
+btnMP4.addEventListener('click', async ()=>{
+  if(!btnMP4.dataset.url) return;
+  try {
+    log('Preparing MP4 download (side)...');
+    const dl = await fetchDownloadUrl(btnMP4.dataset.url, 'mp4');
+    const a = document.createElement('a');
+    a.href = dl;
+    a.download = (current.title || 'video') + '.mp4';
+    a.target = '_blank';
+    document.body.appendChild(a); a.click(); a.remove();
+    log('MP4 download started.');
+  } catch (e) { log('Download error: ' + e.message, true); alert('Download failed'); }
+});
+
+// handle enter key
+qEl.addEventListener('keydown', (e)=> { if(e.key==='Enter') searchBtn.click(); });
+
+// initial sample (optional)
+log('Ready. Paste a YouTube link or search a song.');
 </script>
 </body>
 </html>
