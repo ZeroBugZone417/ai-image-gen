@@ -84,24 +84,8 @@ function log(msg, err=false){
 
 function sanitizeText(s, max=80){ return s?.length>max ? s.slice(0,max-1)+'…':s; }
 
-async function searchYT(query){
-  const api1 = `https://tharuzz-ofc-apis.vercel.app/api/search/ytsearch?query=${encodeURIComponent(query)}`;
-  try{
-    log('Searching...');
-    const res = await fetch(api1);
-    if(!res.ok) throw new Error('API failed');
-    const data = await res.json();
-    if(!data?.result?.length) throw new Error('No results');
-    return data.result.map(item=>(({
-      title: item.title || "Unknown",
-      url: item.url || item.id,
-      thumbnail: item.thumbnail || item.thumb,
-      duration: item.timestamp || item.duration || "Unknown",
-      views: item.views || "N/A",
-      published: item.ago || ""
-    })));
-  }catch(e){ log('Search failed', true); return []; }
-}
+// Replace with your own Node.js server endpoint
+const SERVER_URL = 'http://localhost:3000/api/ytdl';
 
 function renderResults(list){
   resultsEl.innerHTML = '';
@@ -115,18 +99,17 @@ function renderResults(list){
         <p>${it.duration} • ${it.views} • ${it.published}</p>
       </div>
       <div class="resultActions">
-        <button class="smallBtn mp3" data-idx="${idx}">MP3</button>
-        <button class="smallBtn mp4" data-idx="${idx}">MP4</button>
+        <button class="smallBtn mp3" data-url="${it.url}">MP3</button>
+        <button class="smallBtn mp4" data-url="${it.url}">MP4</button>
       </div>`;
     resultsEl.appendChild(item);
   });
 
   document.querySelectorAll('.smallBtn.mp3').forEach(btn=>{
     btn.onclick=()=>{
-      const v=list[parseInt(btn.dataset.idx)];
+      const url = btn.dataset.url;
       const a=document.createElement('a');
-      a.href=`https://tharuzz-ofc-api-v3.vercel.app/api/ytdl/yt?url=${encodeURIComponent(v.url)}&fileType=mp3`;
-      a.download=(v.title||'song')+'.mp3';
+      a.href = `${SERVER_URL}?url=${encodeURIComponent(url)}&fileType=mp3`;
       a.click();
       log('MP3 download started.');
     };
@@ -134,10 +117,9 @@ function renderResults(list){
 
   document.querySelectorAll('.smallBtn.mp4').forEach(btn=>{
     btn.onclick=()=>{
-      const v=list[parseInt(btn.dataset.idx)];
+      const url = btn.dataset.url;
       const a=document.createElement('a');
-      a.href=`https://tharuzz-ofc-api-v3.vercel.app/api/ytdl/yt?url=${encodeURIComponent(v.url)}&fileType=mp4`;
-      a.download=(v.title||'video')+'.mp4';
+      a.href = `${SERVER_URL}?url=${encodeURIComponent(url)}&fileType=mp4`;
       a.click();
       log('MP4 download started.');
     };
@@ -145,14 +127,20 @@ function renderResults(list){
 }
 
 searchBtn.addEventListener('click',async ()=>{
-  const q=qEl.value.trim(); if(!q) return log('Enter search term or paste YouTube URL!');
-  resultsEl.innerHTML='<div style="color:var(--muted)">Searching…</div>';
-  const list=await searchYT(q);
-  renderResults(list);
+  const q=qEl.value.trim(); if(!q) return log('Enter YouTube URL!');
+  // Direct URL mode, skip search API
+  renderResults([{
+    title: q,
+    url: q,
+    thumbnail: 'https://i.ytimg.com/vi/'+q.split('v=')[1]+'/hqdefault.jpg',
+    duration: 'Unknown',
+    views: 'N/A',
+    published: ''
+  }]);
 });
 
 qEl.addEventListener('keydown',e=>{ if(e.key==='Enter') searchBtn.click(); });
-log('Ready. Paste a YouTube link or search a song.');
+log('Ready. Paste a YouTube link to download.');
 </script>
 </body>
 </html>
